@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import ua.kpi.fict.routesearch.entity.Point;
@@ -17,11 +18,20 @@ import ua.kpi.fict.routesearch.service.TimingRouteSearchService;
 @Service
 public class GeneticRouteSearchService extends TimingRouteSearchService {
 
-    private static final double MUTATION_RATE = 0.015;
-    private static final int TOURNAMENT_SIZE = 5;
-    private static final boolean ELITISM_ENABLED = true;
-    private static final int POPULATION_SIZE = 200;
-    private static final int POPULATIONS_IN_EVOLUTION = 200;
+    @Value("${mutation-rate}")
+    private double mutationRate;
+
+    @Value("${tournament-size}")
+    private int tournamentSize;
+
+    @Value("${is-elitism-enabled}")
+    private boolean isElitismEnabled;
+
+    @Value("${population-size}")
+    private int populationSize;
+
+    @Value("${populations-in-evolution-count}")
+    private int populationsInEvolutionCount;
 
     @Override
     protected List<Point> findRoute(List<Point> points) {
@@ -32,7 +42,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     }
 
     private void generateRandomRoutes(List<Point> points, Population population) {
-        for (int i = 0; i < POPULATION_SIZE; i++) {
+        for (int i = 0; i < populationSize; i++) {
             Route route = Route.builder().points(new ArrayList<>(points)).build();
             Collections.shuffle(route.getPoints());
             population.getRoutes().add(route);
@@ -40,7 +50,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     }
 
     private Population performEvolution(Population population) {
-        for (int i = 0; i < POPULATIONS_IN_EVOLUTION; i++) {
+        for (int i = 0; i < populationsInEvolutionCount; i++) {
             population = evolve(population);
         }
         return population;
@@ -49,7 +59,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     private Population evolve(Population population) {
         Population newPopulation = new Population(new ArrayList<>(population.getRoutes().size()));
         int firstChangeableElementIndex = 0;
-        if (ELITISM_ENABLED) {
+        if (isElitismEnabled) {
             newPopulation.getRoutes().add(findFittest(population));
             firstChangeableElementIndex = 1;
         }
@@ -159,7 +169,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
 
     private void mutate(Route route) {
         for (int i = 0; i < route.getPoints().size(); i++) {
-            if (Math.random() < MUTATION_RATE) {
+            if (Math.random() < mutationRate) {
                 int secondPointIndex = (int) (route.getPoints().size() * Math.random());
 
                 Point firstPoint = route.getPoints().get(i);
@@ -172,9 +182,9 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     }
 
     private Route selectByTournament(Population population) {
-        Population tournament = new Population(new ArrayList<>(TOURNAMENT_SIZE));
+        Population tournament = new Population(new ArrayList<>(tournamentSize));
 
-        for (int i = 0; i < TOURNAMENT_SIZE; i++) {
+        for (int i = 0; i < tournamentSize; i++) {
             int index = (int) (Math.random() * population.getRoutes().size());
             tournament.getRoutes().add(i, population.getRoutes().get(index));
         }
