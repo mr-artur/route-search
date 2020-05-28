@@ -1,5 +1,10 @@
 package ua.kpi.fict.routesearch.rest;
 
+import static ua.kpi.fict.routesearch.Constants.API_BASE;
+import static ua.kpi.fict.routesearch.Constants.FIND_ROUTE_BASE;
+import static ua.kpi.fict.routesearch.Constants.GENETIC_ALGORITHM_BASE;
+import static ua.kpi.fict.routesearch.Constants.GREEDY_ALGORITHM_BASE;
+
 import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +27,7 @@ import ua.kpi.fict.routesearch.service.RouteSearchService;
 
 @Slf4j
 @RestController
-@RequestMapping("/find-route")
+@RequestMapping(API_BASE + FIND_ROUTE_BASE)
 @RequiredArgsConstructor
 public class RouteSearchResource {
 
@@ -47,7 +52,7 @@ public class RouteSearchResource {
         }
     }
 
-    @GetMapping("/genetic")
+    @GetMapping(GENETIC_ALGORITHM_BASE)
     public ResponseEntity<RouteSearchResponse> findShortestRouteViaGeneticAlgorithm(
         @Valid @RequestBody GeneticRouteSearchRequest request) {
         log.info("Request to find a shortest route via a genetic algorithm : {}", request);
@@ -56,7 +61,7 @@ public class RouteSearchResource {
         return ResponseEntity.ok(routeSearchDataMapper.toRouteSearchResponse(routeSearchResult));
     }
 
-    @GetMapping("/greedy")
+    @GetMapping(GREEDY_ALGORITHM_BASE)
     public ResponseEntity<RouteSearchResponse> findShortestRouteViaGreedyAlgorithm(
         @Valid @RequestBody GreedyRouteSearchRequest request) {
         log.info("Request to find a shortest route via a greedy algorithm : {}", request);
