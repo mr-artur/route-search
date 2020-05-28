@@ -4,8 +4,9 @@ import static java.util.Objects.isNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -15,10 +16,14 @@ import ua.kpi.fict.routesearch.entity.Point;
 import ua.kpi.fict.routesearch.entity.Population;
 import ua.kpi.fict.routesearch.entity.Route;
 import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
+import ua.kpi.fict.routesearch.service.RouteService;
 import ua.kpi.fict.routesearch.service.TimingRouteSearchService;
 
 @Service
+@RequiredArgsConstructor
 public class GeneticRouteSearchService extends TimingRouteSearchService {
+
+    private final RouteService routeService;
 
     @Value("${mutation-rate}")
     private double mutationRate;
@@ -41,7 +46,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
         updateGeneticPropertiesIfNeeded(inputData);
         generateRandomRoutes(inputData.getPoints(), population);
         population = performEvolution(population);
-        return findFittest(population);
+        return routeService.findFittest(population.getRoutes());
     }
 
     private void updateGeneticPropertiesIfNeeded(RouteSearchInputData inputData) {
@@ -78,7 +83,7 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
         Population newPopulation = new Population(new ArrayList<>(population.getRoutes().size()));
         int firstChangeableElementIndex = 0;
         if (isElitismEnabled) {
-            newPopulation.getRoutes().add(findFittest(population));
+            newPopulation.getRoutes().add(routeService.findFittest(population.getRoutes()));
             firstChangeableElementIndex = 1;
         }
         provideInheritanceInPopulation(population, newPopulation, firstChangeableElementIndex);
@@ -100,46 +105,6 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
         for (int i = firstChangeableElementIndex; i < newPopulation.getRoutes().size(); i++) {
             mutate(newPopulation.getRoutes().get(i));
         }
-    }
-
-    private Route findFittest(Population population) {
-        List<Route> routes = population.getRoutes();
-        Route fittestRoute = routes.get(0);
-        for (int i = 1; i < routes.size(); i++) {
-            if (getRouteFitness(fittestRoute) <= getRouteFitness(routes.get(i))) {
-                fittestRoute = routes.get(i);
-            }
-        }
-        return fittestRoute;
-    }
-
-    private double getRouteFitness(Route route) {
-        if (isNull(route.getFitness())) {
-            route.setFitness(1 / (double) calculateDistance(route));
-        }
-        return route.getFitness();
-    }
-
-    private int calculateDistance(Route route) {
-        if (isNull(route.getDistance())) {
-            int distance = 0;
-            Iterator<Point> iterator = route.getPoints().iterator();
-            Point from = iterator.next();
-
-            while (iterator.hasNext()) {
-                Point to = iterator.next();
-                distance += calculateDistance(from, to);
-                from = to;
-            }
-            route.setDistance(distance);
-        }
-        return route.getDistance();
-    }
-
-    private double calculateDistance(Point firstPoint, Point secondPoint) {
-        int xDistance = Math.abs(firstPoint.getX() - secondPoint.getX());
-        int yDistance = Math.abs(firstPoint.getY() - secondPoint.getY());
-        return Math.sqrt((xDistance * xDistance) + (yDistance * yDistance));
     }
 
     private Route crossover(Route firstParent, Route secondParent) {
@@ -206,6 +171,6 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
             int index = (int) (Math.random() * population.getRoutes().size());
             tournament.getRoutes().add(i, population.getRoutes().get(index));
         }
-        return findFittest(tournament);
+        return routeService.findFittest(tournament.getRoutes());
     }
 }
