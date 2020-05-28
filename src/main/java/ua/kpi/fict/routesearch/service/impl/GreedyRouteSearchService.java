@@ -7,6 +7,7 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 import ua.kpi.fict.routesearch.entity.Point;
+import ua.kpi.fict.routesearch.entity.Route;
 import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
 import ua.kpi.fict.routesearch.service.TimingRouteSearchService;
 
@@ -16,18 +17,18 @@ public class GreedyRouteSearchService extends TimingRouteSearchService {
     private static final Random random = new Random();
 
     @Override
-    protected List<Point> findRoute(RouteSearchInputData inputData) {
+    protected Route findRoute(RouteSearchInputData inputData) {
         List<Point> copiedPoints = new ArrayList<>(inputData.getPoints());
-        List<Point> route = new ArrayList<>();
+        List<Point> resultPoints = new ArrayList<>();
 
-        Point currentPoint = chooseFirstPointAndMoveItToResult(copiedPoints, route);
-        addRemainingPointsToRoute(copiedPoints, route, currentPoint);
-        return route;
+        Point currentPoint = chooseFirstPointAndMoveItToResult(copiedPoints, resultPoints);
+        addRemainingPointsToResult(copiedPoints, resultPoints, currentPoint);
+        return Route.builder().points(resultPoints).build();
     }
 
-    private Point chooseFirstPointAndMoveItToResult(List<Point> copiedPoints, List<Point> route) {
+    private Point chooseFirstPointAndMoveItToResult(List<Point> copiedPoints, List<Point> resultPoints) {
         Point currentPoint = getRandomPoint(copiedPoints);
-        route.add(currentPoint);
+        resultPoints.add(currentPoint);
         copiedPoints.remove(currentPoint);
         return currentPoint;
     }
@@ -36,10 +37,10 @@ public class GreedyRouteSearchService extends TimingRouteSearchService {
         return copiedPoints.get(random.nextInt(copiedPoints.size()));
     }
 
-    private void addRemainingPointsToRoute(List<Point> copiedPoints, List<Point> route, Point currentPoint) {
+    private void addRemainingPointsToResult(List<Point> copiedPoints, List<Point> resultPoints, Point currentPoint) {
         while (!copiedPoints.isEmpty()) {
             Point nearestPoint = findNearestPointInList(currentPoint, copiedPoints);
-            route.add(nearestPoint);
+            resultPoints.add(nearestPoint);
             currentPoint = nearestPoint;
             copiedPoints.remove(nearestPoint);
         }

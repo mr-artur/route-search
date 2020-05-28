@@ -36,12 +36,12 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     private int populationsInEvolutionCount;
 
     @Override
-    protected List<Point> findRoute(RouteSearchInputData inputData) {
+    protected Route findRoute(RouteSearchInputData inputData) {
         Population population = new Population();
         updateGeneticPropertiesIfNeeded(inputData);
         generateRandomRoutes(inputData.getPoints(), population);
         population = performEvolution(population);
-        return findFittest(population).getPoints();
+        return findFittest(population);
     }
 
     private void updateGeneticPropertiesIfNeeded(RouteSearchInputData inputData) {

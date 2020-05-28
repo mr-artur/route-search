@@ -15,4 +15,6 @@ public class RouteSearchResponse {
     private List<PointResponse> route;
 
     private Long millisecondsTaken;
+
+    private Integer distance;
 }

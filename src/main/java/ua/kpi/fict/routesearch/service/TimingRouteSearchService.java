@@ -1,9 +1,8 @@
 package ua.kpi.fict.routesearch.service;
 
 import java.time.Clock;
-import java.util.List;
 
-import ua.kpi.fict.routesearch.entity.Point;
+import ua.kpi.fict.routesearch.entity.Route;
 import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
 import ua.kpi.fict.routesearch.entity.RouteSearchResult;
 
@@ -15,13 +14,13 @@ public abstract class TimingRouteSearchService implements RouteSearchService {
         RouteSearchResult result = new RouteSearchResult();
 
         long millisecondsAtStart = clock.millis();
-        List<Point> route = findRoute(inputData);
+        Route route = findRoute(inputData);
         long millisecondsAtEnd = clock.millis();
 
-        result.setPoints(route);
+        result.setRoute(route);
         result.setMillisecondsTaken(millisecondsAtEnd - millisecondsAtStart);
         return result;
     }
 
-    protected abstract List<Point> findRoute(RouteSearchInputData inputData);
+    protected abstract Route findRoute(RouteSearchInputData inputData);
 }

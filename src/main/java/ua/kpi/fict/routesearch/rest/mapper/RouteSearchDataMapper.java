@@ -12,7 +12,7 @@ import ua.kpi.fict.routesearch.rest.request.RouteSearchRequest;
 import ua.kpi.fict.routesearch.rest.response.RouteSearchResponse;
 
 @Mapper
-public interface PointMapper {
+public interface RouteSearchDataMapper {
 
     RouteSearchInputData toRouteSearchInputData(RouteSearchRequest request);
 
@@ -20,6 +20,7 @@ public interface PointMapper {
 
     GeneticRouteSearchInputData toGeneticRouteSearchInputData(GeneticRouteSearchRequest request);
 
-    @Mapping(target = "route", source = "points")
+    @Mapping(target = "route", source = "route.points")
+    @Mapping(target = "distance", source = "route.distance")
     RouteSearchResponse toRouteSearchResponse(RouteSearchResult routeSearchResult);
 }
