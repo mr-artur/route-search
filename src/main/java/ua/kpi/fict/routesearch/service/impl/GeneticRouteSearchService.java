@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import ua.kpi.fict.routesearch.entity.Point;
 import ua.kpi.fict.routesearch.entity.Population;
 import ua.kpi.fict.routesearch.entity.Route;
+import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
 import ua.kpi.fict.routesearch.service.TimingRouteSearchService;
 
 @Service
@@ -34,9 +35,9 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     private int populationsInEvolutionCount;
 
     @Override
-    protected List<Point> findRoute(List<Point> points) {
+    protected List<Point> findRoute(RouteSearchInputData inputData) {
         Population population = new Population();
-        generateRandomRoutes(points, population);
+        generateRandomRoutes(inputData.getPoints(), population);
         population = performEvolution(population);
         return findFittest(population).getPoints();
     }

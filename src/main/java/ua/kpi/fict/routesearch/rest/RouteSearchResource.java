@@ -1,7 +1,5 @@
 package ua.kpi.fict.routesearch.rest;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -13,10 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ua.kpi.fict.routesearch.entity.Point;
+import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
 import ua.kpi.fict.routesearch.entity.RouteSearchResult;
 import ua.kpi.fict.routesearch.rest.mapper.PointMapper;
-import ua.kpi.fict.routesearch.rest.request.PointRequest;
+import ua.kpi.fict.routesearch.rest.request.GeneticRouteSearchRequest;
+import ua.kpi.fict.routesearch.rest.request.GreedyRouteSearchRequest;
 import ua.kpi.fict.routesearch.rest.request.RouteSearchRequest;
 import ua.kpi.fict.routesearch.rest.response.RouteSearchResponse;
 import ua.kpi.fict.routesearch.service.RouteSearchService;
@@ -34,38 +33,35 @@ public class RouteSearchResource {
     @GetMapping
     public ResponseEntity<RouteSearchResponse> findShortestRoute(
         @Valid @RequestBody RouteSearchRequest request) {
-
         log.info("Request to find a shortest route : {}", request);
-        List<Point> points = pointMapper.toPointList(request.getPoints());
-        RouteSearchResult routeSearchResult;
-
-        if (request.isTimeCritical()) {
-            routeSearchResult = greedyRouteSearchService.findShortestRoute(points);
-        } else {
-            routeSearchResult = geneticRouteSearchService.findShortestRoute(points);
-        }
+        RouteSearchInputData inputData = pointMapper.toRouteSearchInputData(request);
+        RouteSearchResult routeSearchResult = findShortestRoute(request, inputData);
         return ResponseEntity.ok(pointMapper.toRouteSearchResponse(routeSearchResult));
+    }
+
+    private RouteSearchResult findShortestRoute(RouteSearchRequest request, RouteSearchInputData inputData) {
+        if (request.isTimeCritical()) {
+            return greedyRouteSearchService.findShortestRoute(inputData);
+        } else {
+            return geneticRouteSearchService.findShortestRoute(inputData);
+        }
     }
 
     @GetMapping("/genetic")
     public ResponseEntity<RouteSearchResponse> findShortestRouteViaGeneticAlgorithm(
-        @Valid @RequestBody List<PointRequest> pointRequests) {
-
-        log.info("Request to find a shortest route by a genetic algorithm : {}", pointRequests);
-        List<Point> points = pointMapper.toPointList(pointRequests);
-        RouteSearchResult routeSearchResult = geneticRouteSearchService.findShortestRoute(points);
-
+        @Valid @RequestBody GeneticRouteSearchRequest request) {
+        log.info("Request to find a shortest route via a genetic algorithm : {}", request);
+        RouteSearchInputData inputData = pointMapper.toGeneticRouteSearchInputData(request);
+        RouteSearchResult routeSearchResult = geneticRouteSearchService.findShortestRoute(inputData);
         return ResponseEntity.ok(pointMapper.toRouteSearchResponse(routeSearchResult));
     }
 
     @GetMapping("/greedy")
     public ResponseEntity<RouteSearchResponse> findShortestRouteViaGreedyAlgorithm(
-        @Valid @RequestBody List<PointRequest> pointRequests) {
-
-        log.info("Request to find a shortest route by a greedy algorithm : {}", pointRequests);
-        List<Point> points = pointMapper.toPointList(pointRequests);
-        RouteSearchResult routeSearchResult = greedyRouteSearchService.findShortestRoute(points);
-
+        @Valid @RequestBody GreedyRouteSearchRequest request) {
+        log.info("Request to find a shortest route via a greedy algorithm : {}", request);
+        RouteSearchInputData inputData = pointMapper.toRouteSearchInputData(request);
+        RouteSearchResult routeSearchResult = greedyRouteSearchService.findShortestRoute(inputData);
         return ResponseEntity.ok(pointMapper.toRouteSearchResponse(routeSearchResult));
     }
 }

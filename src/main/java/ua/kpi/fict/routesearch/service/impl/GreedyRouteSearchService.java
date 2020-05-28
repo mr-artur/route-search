@@ -7,6 +7,7 @@ import java.util.Random;
 import org.springframework.stereotype.Service;
 
 import ua.kpi.fict.routesearch.entity.Point;
+import ua.kpi.fict.routesearch.entity.RouteSearchInputData;
 import ua.kpi.fict.routesearch.service.TimingRouteSearchService;
 
 @Service
@@ -15,8 +16,8 @@ public class GreedyRouteSearchService extends TimingRouteSearchService {
     private static final Random random = new Random();
 
     @Override
-    protected List<Point> findRoute(List<Point> points) {
-        List<Point> copiedPoints = new ArrayList<>(points);
+    protected List<Point> findRoute(RouteSearchInputData inputData) {
+        List<Point> copiedPoints = new ArrayList<>(inputData.getPoints());
         List<Point> route = new ArrayList<>();
 
         Point currentPoint = chooseFirstPointAndMoveItToResult(copiedPoints, route);
