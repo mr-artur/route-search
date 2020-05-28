@@ -2,6 +2,7 @@ package ua.kpi.fict.routesearch.service.impl;
 
 import static java.util.Objects.isNull;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -29,6 +30,27 @@ public class RouteServiceImpl implements RouteService {
             }
         }
         return fittestRoute;
+    }
+
+    @Override
+    public List<Route> findSeveralFittest(List<Route> routes, int quantity) {
+        List<Route> routesCopy = new ArrayList<>(routes);
+
+        if (quantity > routesCopy.size()) {
+            quantity = routesCopy.size();
+        }
+        return findNFittestRoutes(quantity, routesCopy);
+    }
+
+    private List<Route> findNFittestRoutes(int quantity, List<Route> routes) {
+        List<Route> result = new ArrayList<>();
+
+        for (int i = 0; i < quantity; i++) {
+            Route fittestRoute = findFittest(routes);
+            result.add(fittestRoute);
+            routes.remove(fittestRoute);
+        }
+        return result;
     }
 
     @Override

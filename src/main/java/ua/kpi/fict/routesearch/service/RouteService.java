@@ -8,6 +8,8 @@ public interface RouteService {
 
     public Route findFittest(List<Route> routes);
 
+    public List<Route> findSeveralFittest(List<Route> routes, int quantity);
+
     public double getFitness(Route route);
 
     public int calculateDistance(Route route);

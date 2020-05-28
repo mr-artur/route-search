@@ -3,6 +3,7 @@ package ua.kpi.fict.routesearch.rest.request;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,4 +28,7 @@ public class GeneticRouteSearchRequest {
     private Integer populationsInEvolutionCount;
 
     private Boolean elitismEnabled;
+
+    @Positive
+    private Integer elitePointsCount;
 }

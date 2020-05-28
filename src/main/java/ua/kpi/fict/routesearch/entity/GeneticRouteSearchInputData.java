@@ -22,4 +22,6 @@ public class GeneticRouteSearchInputData extends RouteSearchInputData {
     private Integer populationsInEvolutionCount;
 
     private Boolean elitismEnabled;
+
+    private Integer elitePointsCount;
 }

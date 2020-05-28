@@ -25,20 +25,30 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
 
     private final RouteService routeService;
 
-    @Value("${mutation-rate}")
+    @Value("${default.mutation-rate}")
+    private double defaultMutationRate;
+
+    @Value("${default.is-elitism-enabled}")
+    private boolean defaultIsElitismEnabled;
+
+    @Value("${default.tournament-size}")
+    private int defaultTournamentSize;
+
+    @Value("${default.population-size}")
+    private int defaultPopulationSize;
+
+    @Value("${default.populations-in-evolution-count}")
+    private int defaultPopulationsInEvolutionCount;
+
+    @Value("${default.elite-points-count}")
+    private int defaultElitePointsCount;
+
     private double mutationRate;
-
-    @Value("${tournament-size}")
-    private int tournamentSize;
-
-    @Value("${is-elitism-enabled}")
     private boolean isElitismEnabled;
-
-    @Value("${population-size}")
+    private int tournamentSize;
     private int populationSize;
-
-    @Value("${populations-in-evolution-count}")
     private int populationsInEvolutionCount;
+    private int elitePointsCount;
 
     @Override
     protected Route findRoute(RouteSearchInputData inputData) {
@@ -56,12 +66,15 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     }
 
     private void setGeneticPropertiesFromInputData(GeneticRouteSearchInputData inputData) {
-        mutationRate = isNull(inputData.getMutationRate()) ? mutationRate : inputData.getMutationRate();
-        tournamentSize = isNull(inputData.getTournamentSize()) ? tournamentSize : inputData.getTournamentSize();
-        isElitismEnabled = isNull(inputData.getElitismEnabled()) ? isElitismEnabled : inputData.getElitismEnabled();
-        populationSize = isNull(inputData.getPopulationSize()) ? populationSize : inputData.getPopulationSize();
+        mutationRate = isNull(inputData.getMutationRate()) ? defaultMutationRate : inputData.getMutationRate();
+        tournamentSize = isNull(inputData.getTournamentSize()) ? defaultTournamentSize : inputData.getTournamentSize();
+        populationSize = isNull(inputData.getPopulationSize()) ? defaultPopulationSize : inputData.getPopulationSize();
+        isElitismEnabled = isNull(inputData.getElitismEnabled())
+            ? defaultIsElitismEnabled : inputData.getElitismEnabled();
         populationsInEvolutionCount = isNull(inputData.getPopulationsInEvolutionCount())
-            ? populationsInEvolutionCount : inputData.getPopulationsInEvolutionCount();
+            ? defaultPopulationsInEvolutionCount : inputData.getPopulationsInEvolutionCount();
+        elitePointsCount = isNull(inputData.getElitePointsCount()) || !defaultIsElitismEnabled
+            ? defaultElitePointsCount : inputData.getElitePointsCount();
     }
 
     private void generateRandomRoutes(List<Point> points, Population population) {
@@ -83,8 +96,8 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
         Population newPopulation = new Population(new ArrayList<>(population.getRoutes().size()));
         int firstChangeableElementIndex = 0;
         if (isElitismEnabled) {
-            newPopulation.getRoutes().add(routeService.findFittest(population.getRoutes()));
-            firstChangeableElementIndex = 1;
+            newPopulation.getRoutes().addAll(routeService.findSeveralFittest(population.getRoutes(), elitePointsCount));
+            firstChangeableElementIndex = elitePointsCount;
         }
         provideInheritanceInPopulation(population, newPopulation, firstChangeableElementIndex);
         performMutationInPopulation(newPopulation, firstChangeableElementIndex);
