@@ -17,4 +17,14 @@ public class GeneticRouteSearchRequest {
 
     @NotNull
     private List<PointRequest> points;
+
+    private Double mutationRate;
+
+    private Integer tournamentSize;
+
+    private Integer populationSize;
+
+    private Integer populationsInEvolutionCount;
+
+    private Boolean elitismEnabled;
 }

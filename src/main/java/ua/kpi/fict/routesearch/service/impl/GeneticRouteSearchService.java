@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import ua.kpi.fict.routesearch.entity.GeneticRouteSearchInputData;
 import ua.kpi.fict.routesearch.entity.Point;
 import ua.kpi.fict.routesearch.entity.Population;
 import ua.kpi.fict.routesearch.entity.Route;
@@ -37,9 +38,25 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     @Override
     protected List<Point> findRoute(RouteSearchInputData inputData) {
         Population population = new Population();
+        updateGeneticPropertiesIfNeeded(inputData);
         generateRandomRoutes(inputData.getPoints(), population);
         population = performEvolution(population);
         return findFittest(population).getPoints();
+    }
+
+    private void updateGeneticPropertiesIfNeeded(RouteSearchInputData inputData) {
+        if (inputData instanceof GeneticRouteSearchInputData) {
+            setGeneticPropertiesFromInputData((GeneticRouteSearchInputData) inputData);
+        }
+    }
+
+    private void setGeneticPropertiesFromInputData(GeneticRouteSearchInputData inputData) {
+        mutationRate = isNull(inputData.getMutationRate()) ? mutationRate : inputData.getMutationRate();
+        tournamentSize = isNull(inputData.getTournamentSize()) ? tournamentSize : inputData.getTournamentSize();
+        isElitismEnabled = isNull(inputData.getElitismEnabled()) ? isElitismEnabled : inputData.getElitismEnabled();
+        populationSize = isNull(inputData.getPopulationSize()) ? populationSize : inputData.getPopulationSize();
+        populationsInEvolutionCount = isNull(inputData.getPopulationsInEvolutionCount())
+            ? populationsInEvolutionCount : inputData.getPopulationsInEvolutionCount();
     }
 
     private void generateRandomRoutes(List<Point> points, Population population) {

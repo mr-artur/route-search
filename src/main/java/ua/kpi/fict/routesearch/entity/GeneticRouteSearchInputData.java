@@ -12,4 +12,14 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class GeneticRouteSearchInputData extends RouteSearchInputData {
+
+    private Double mutationRate;
+
+    private Integer tournamentSize;
+
+    private Integer populationSize;
+
+    private Integer populationsInEvolutionCount;
+
+    private Boolean elitismEnabled;
 }
