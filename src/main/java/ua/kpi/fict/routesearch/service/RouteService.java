@@ -6,11 +6,11 @@ import ua.kpi.fict.routesearch.entity.Route;
 
 public interface RouteService {
 
-    public Route findFittest(List<Route> routes);
+    Route findFittest(List<Route> routes);
 
-    public List<Route> findSeveralFittest(List<Route> routes, int quantity);
+    List<Route> findSeveralFittest(List<Route> routes, int quantity);
 
-    public double getFitness(Route route);
+    double getFitness(Route route);
 
-    public int calculateDistance(Route route);
+    int calculateDistance(Route route);
 }

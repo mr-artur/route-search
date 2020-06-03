@@ -62,7 +62,18 @@ public class GeneticRouteSearchService extends TimingRouteSearchService {
     private void updateGeneticPropertiesIfNeeded(RouteSearchInputData inputData) {
         if (inputData instanceof GeneticRouteSearchInputData) {
             setGeneticPropertiesFromInputData((GeneticRouteSearchInputData) inputData);
+        } else {
+            setDefaultGeneticProperties();
         }
+    }
+
+    private void setDefaultGeneticProperties() {
+        mutationRate =  defaultMutationRate;
+        tournamentSize = defaultTournamentSize;
+        populationSize = defaultPopulationSize;
+        isElitismEnabled = defaultIsElitismEnabled;
+        populationsInEvolutionCount = defaultPopulationsInEvolutionCount;
+        elitePointsCount = defaultElitePointsCount;
     }
 
     private void setGeneticPropertiesFromInputData(GeneticRouteSearchInputData inputData) {
